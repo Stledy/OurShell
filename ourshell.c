@@ -17,7 +17,7 @@ void myenviron();
 void myecho(char *message);
 void myhelp();
 void mypause();
-void myone();  // Custom Command
+void myone();  // Live Weather Report
 
 // Main Function
 int main() {
@@ -122,7 +122,8 @@ void mypause() {
     getchar();
 }
 
-// Custom Command: Counts Running Processes
+// Custom Command: Live Weather Report
 void myone() {
-    system("ps -e | wc -l");
+    printf("Fetching live weather report...\n");
+    system("curl -s 'wttr.in?format=3'");
 }
