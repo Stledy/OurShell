@@ -18,6 +18,7 @@ void myecho(char *message);
 void myhelp();
 void mypause();
 void myone();  // Live Weather Report
+void readFile();
 
 // Main Function
 int main() {
@@ -125,5 +126,29 @@ void mypause() {
 // Custom Command: Live Weather Report
 void myone() {
     printf("Fetching live weather report...\n");
-    system("curl -s 'wttr.in?format=3'");
+     system("curl -s wttr.in/Maseru?format=3");
+     // system("cat announcements.txt");
+     system("df -h");
+     system("free -h");
+     system("scrot evidence.png");
+    //system("curl -s wttr.in/~-29.310054,27.478222?format=3"); 
+    readFile();
+}
+
+void readFile() {
+
+        // News and events in annoucements text
+        FILE *file = fopen("announcements.txt", "r");
+
+        if (file == NULL) {
+            perror("Check if announcements.txt exits");
+            return;
+        }
+
+        char line[256]; // Buffer to store each line, string is not built-in in C
+        while(fgets(line, sizeof(line), file) != NULL) {
+            printf("%s", line);
+        }
+        fclose(file);
+        printf("File reading completed.\n");
 }
