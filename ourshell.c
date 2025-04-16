@@ -39,6 +39,12 @@ void shell_loop() {
 
         input[strcspn(input, "\n")] = 0;  // Remove newline character
         if (strlen(input) > 0) {
+            // convert to lowercase
+            for (int i = 0; input[i]; i++)
+            {
+                input[i] = tolower((unsigned char) input[i]);
+            }
+            
             execute_command(input);
         }
     }
