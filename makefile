@@ -1,11 +1,14 @@
-CC=gcc
-CFLAGS=-Wall
-TARGET=ourshell
+CC = gcc
+CFLAGS = -Wall -Wextra
+TARGET = OurShell
+SRC = ourshell.c
 
 all: $(TARGET)
 
-$(TARGET): ourshell.c
-	$(CC) $(CFLAGS) -o $(TARGET) ourshell.c
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
 
 clean:
 	rm -f $(TARGET)
+
+.PHONY: all clean

@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/types.h>
+#include <ctype.h>
+#include <time.h>
 
 #define MAX_INPUT 1024
 
@@ -17,32 +19,47 @@ void myenviron();
 void myecho(char *message);
 void myhelp();
 void mypause();
-void myone();  // Live Weather Report
-void readFile();
+void myone();  // System information command
+void set_shell_env();
+char* generate_screenshot_filename();
+
+// Global for shell path
+char shell_path[MAX_INPUT];
 
 // Main Function
 int main() {
+    // Set the shell environment variable
+    if (getcwd(shell_path, sizeof(shell_path)) != NULL) {
+        strcat(shell_path, "/OurShell");
+        setenv("shell", shell_path, 1);
+    }
+    
     shell_loop();
     return 0;
 }
 
-// Shell Loop
+// Shell Loop with current directory in prompt
 void shell_loop() {
     char input[MAX_INPUT];
+    char cwd[MAX_INPUT];
 
     while (1) {
-        printf("OurShell> ");  // Display shell prompt
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            printf("OurShell [%s]> ", cwd);
+        } else {
+            printf("OurShell> ");
+        }
+
         if (fgets(input, MAX_INPUT, stdin) == NULL) {
             printf("\nExiting...\n");
             break;
         }
 
-        input[strcspn(input, "\n")] = 0;  // Remove newline character
+        input[strcspn(input, "\n")] = 0;  // Remove newline
         if (strlen(input) > 0) {
-            // convert to lowercase
-            for (int i = 0; input[i]; i++)
-            {
-                input[i] = tolower((unsigned char) input[i]);
+            // Convert to lowercase
+            for (int i = 0; input[i]; i++) {
+                input[i] = tolower((unsigned char)input[i]);
             }
             
             execute_command(input);
@@ -129,32 +146,46 @@ void mypause() {
     getchar();
 }
 
-// Custom Command: Live Weather Report
-void myone() {
-    printf("Fetching live weather report...\n");
-     system("curl -s wttr.in/Maseru?format=3");
-     // system("cat announcements.txt");
-     system("df -h");
-     system("free -h");
-     system("scrot evidence.png");
-    //system("curl -s wttr.in/~-29.310054,27.478222?format=3"); 
-    readFile();
+// Generate unique screenshot filename with timestamp
+char* generate_screenshot_filename() {
+    static char filename[50];
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    
+    strftime(filename, sizeof(filename), "system_info_%Y%m%d_%H%M%S.png", t);
+    return filename;
 }
 
-void readFile() {
-
-        // News and events in annoucements text
-        FILE *file = fopen("announcements.txt", "r");
-
-        if (file == NULL) {
-            perror("Check if announcements.txt exits");
-            return;
-        }
-
-        char line[256]; // Buffer to store each line, string is not built-in in C
-        while(fgets(line, sizeof(line), file) != NULL) {
-            printf("%s", line);
-        }
-        fclose(file);
-        printf("File reading completed.\n");
+// Custom Command: System Information Display
+void myone() {
+    printf("\n=== System Information ===\n");
+    
+    // 1. Disk Usage (Memory Space)
+    printf("\n💾 Disk Usage:\n");
+    system("df -h --output=source,size,used,avail,pcent,target | grep -E 'Filesystem|/$'");
+    
+    // 2. RAM Information
+    printf("\n🧠 RAM Usage:\n");
+    system("free -h | awk 'NR==1 || NR==2 {print}'");
+    
+    // 3. Battery Information
+    printf("\n🔋 Battery Status:\n");
+    int battery_result = system("upower -i $(upower -e | grep battery) 2>/dev/null | grep -E 'state|time|percentage'");
+    if (battery_result != 0) {
+        printf("No battery information available\n");
+    }
+    
+    // 4. Take screenshot
+    char screenshot_cmd[100];
+    char* filename = generate_screenshot_filename();
+    snprintf(screenshot_cmd, sizeof(screenshot_cmd), "scrot -u '%s'", filename);
+    
+    printf("\n📸 Saving screenshot as %s...\n", filename);
+    if (system(screenshot_cmd) == 0) {
+        printf("Screenshot saved successfully!\n");
+    } else {
+        printf("Failed to take screenshot. Is scrot installed?\n");
+    }
+    
+    printf("\n=== Information display completed ===\n");
 }
