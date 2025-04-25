@@ -1,11 +1,11 @@
 Welcome to OurShell - A simple Linux shell
 ------------------------------------------
-mycd <directory>  : Change directory
+mycd <directory>  : Change or show current directory
 myclr             : Clear the screen
 mydir <directory> : List directory contents
 myenviron         : Show environment variables
 myecho <message>  : Print a message
 myhelp            : Display this help manual
 mypause           : Pause until Enter is pressed
-myone             : Count the number of running processes
+myone             : Workplace assistant (weather, announcements, system info)
 myquit            : Exit OurShell
