@@ -178,11 +178,11 @@ void myone() {
     // 4. Take screenshot
     char screenshot_cmd[100];
     char* filename = generate_screenshot_filename();
-    snprintf(screenshot_cmd, sizeof(screenshot_cmd), "scrot -u '%s'", filename);
+    snprintf(screenshot_cmd, sizeof(screenshot_cmd), "scrot -d 1 '%s'", filename);
     
     printf("\n📸 Saving screenshot as %s...\n", filename);
     if (system(screenshot_cmd) == 0) {
-        printf("Screenshot saved successfully!\n");
+        printf("Screenshot saved successfully\n");
     } else {
         printf("Failed to take screenshot. Is scrot installed?\n");
     }
